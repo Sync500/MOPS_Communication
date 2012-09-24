@@ -1,7 +1,7 @@
 /**
  * 
  */
-package communication_sendMessage;
+package others;
 
 import java.io.BufferedReader;
 import java.io.IOException;
