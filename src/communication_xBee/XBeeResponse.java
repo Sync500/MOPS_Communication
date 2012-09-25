@@ -11,28 +11,36 @@ import com.rapplogic.xbee.api.wpan.RxResponseIoSample;
  */
 
 public class XBeeResponse {
-
+	
+	static XBee xbee;
+	String comInt; // serial interface
+	int port; // and port number
+	
 	/**
 	 * @param args
 	 * @throws XBeeException 
 	 */
-	public static void main(String[] args) throws XBeeException {
-		// create object for the communication_sendObject with the serial Interface and port
-		XBee xbee = new XBee();         
-		xbee.open("COM5", 9600);  //serial port and list on port 9600
-		                        
-		while (true) {
-		    //here comes the response from xBee
-			RxResponseIoSample ioSample = (RxResponseIoSample) xbee.getResponse();
+	
+	public void response(String comInt, int port) throws XBeeException{
+	// create object for the communication with serial Interface and port
+			xbee = new XBee(); 
+			xbee.open(comInt,port);
+			                        
+			while (true) {
+			    //here comes the response from xBee
+				RxResponseIoSample ioSample = (RxResponseIoSample) xbee.getResponse();
 
-		    System.out.println("We received data from " + ioSample.getSourceAddress());     
-		                        
-		    if (ioSample.containsAnalog()) {
-		        System.out.println("10-bit temp reading (pin 19) is " 
-		        		+ ioSample.getSamples()[0].getAnalog1());
-		    }
-		}
+			    System.out.println("We received data from " + ioSample.getSourceAddress());     
+			                        
+			    if (ioSample.containsAnalog()) {
+			        System.out.println("10-bit temp reading (pin 19) is " 
+			        		+ ioSample.getSamples()[0].getAnalog1());
+			    }
+			}		
+	}
 
+	public static void main(String[] args) {
+			//unsused
 	}
 
 }
