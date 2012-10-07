@@ -38,6 +38,7 @@ public class ServSocket implements Serializable {
 			
 			ia = clientSocket.getInetAddress();
 			System.out.println("Welcome on " + ia); // show the client ip4 addr
+			System.out.println("connected to client: " + clientSocket.isConnected());
 			
 			objInput = new ObjectInputStream(clientSocket.getInputStream()); // return Input
 			TestData in =  (TestData) objInput.readObject(); // read serialize class/object - generate new object and cast 

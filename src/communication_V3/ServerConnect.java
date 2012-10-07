@@ -114,6 +114,7 @@ public class ServerConnect{
 		try{
 			writer = new BufferedWriter(new OutputStreamWriter(new BufferedOutputStream
 					(clientSocket.getOutputStream())));
+			System.out.println("writer constructed");
 		}catch(Exception e){
 			System.out.println("writer cant construct");
 		}

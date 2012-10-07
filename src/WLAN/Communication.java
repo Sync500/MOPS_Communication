@@ -17,14 +17,14 @@ import java.net.Socket;
  */
 public class Communication {
 	
-	ServerSocket 		serverSocket = null;
-	Socket 				clientSocket = null;
+	static ServerSocket 		serverSocket = null;
+	static Socket 				clientSocket = null;
+	private String 				ip = null;
 	
 	/**
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		Communication com = new Communication();
 		try{
 			new runServer().start(); // JVM use the run-method and start two threads
 			new RunClient().start(); // Client start - its the same
@@ -44,22 +44,21 @@ public class Communication {
 		//
 	}
 	
-	void setServerAddressWLAn(String ip, int port){
-		//
+	void setServerAddressWLAn(String ip){
+		this.ip = ip;
 	}
 	
-	boolean getStatus(){
+	boolean getStatus(Socket socket){
 		boolean isAlive = false;
 		
-		isAlive = clientSocket.isConnected();
+		isAlive = socket.isConnected();
 		
 		if(!isAlive){
-			System.out.println("Connection: OFF");
+			//System.out.println("Connection: OFF");
 			return false;
 		}
-		System.out.println("Connection: ON");
-		return true;
-		//
+			//System.out.println("Connection: ON");
+			return true;
 	}
 	
 	void event(){
@@ -78,7 +77,7 @@ class runServer extends Thread{
 	Socket 				clientSocket = null;
 	PrintWriter 		writer = null;
 	BufferedReader 		reader = null;
-	int 				port = 6665; // dont use port 1-2000
+	final int			port = 6665; // dont use port 1-2000
 	
 	runServer(){	
 		try {
@@ -96,6 +95,8 @@ class runServer extends Thread{
 			try{
 					clientSocket = serverSocket.accept(); // wait on client
 					System.out.println("Socket create");
+					Communication com = new Communication();
+					System.out.println("Status is: " + com.getStatus(clientSocket));
 					
 					 // generate object - OutputStream with autoFlush
 					writer = new PrintWriter(clientSocket.getOutputStream(), true);

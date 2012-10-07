@@ -45,7 +45,7 @@ public class ClientConnect{
 		String msg = "";
 		try {
 			msg = reader.readLine();
-			System.out.println("Your Message is " + msg);
+			//System.out.println("Your Message is " + msg);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
