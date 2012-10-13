@@ -11,6 +11,8 @@ public class B{
 	ObjectOutputStream out;
  	ObjectInputStream in;
  	String message;
+	BufferedReader 		reader = null;
+	InputStreamReader   isr = null;
 	B(){}
 	void run()
 	{
@@ -22,19 +24,23 @@ public class B{
 			out = new ObjectOutputStream(requestSocket.getOutputStream());
 			out.flush();
 			in = new ObjectInputStream(requestSocket.getInputStream());
+			String yourmessage = "";
 			//3: Communicating with the server
 			do{
 				try{
-					message = (String)in.readObject();
-					System.out.println("server>" + message);
+					yourmessage = (String)in.readObject();
+					System.out.println("server>" + yourmessage);
 					sendMessage("Hi my server");
-					message = "bye";
-					sendMessage(message);
+					reader = new BufferedReader(isr = new InputStreamReader(System.in));
+					
+					yourmessage = reader.readLine();
+					sendMessage(yourmessage);
+//					sendMessage(message);
 				}
 				catch(ClassNotFoundException classNot){
 					System.err.println("data received in unknown format");
 				}
-			}while(!message.equals("bye"));
+			}while(!yourmessage.equals("bye"));
 		}
 		catch(UnknownHostException unknownHost){
 			System.err.println("You are trying to connect to an unknown host!");

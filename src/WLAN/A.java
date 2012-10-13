@@ -6,11 +6,13 @@ package WLAN;
 import java.io.*;
 import java.net.*;
 public class A{
-	ServerSocket providerSocket;
-	Socket connection = null;
-	ObjectOutputStream out;
-	ObjectInputStream in;
-	String message;
+	private ServerSocket 	providerSocket;
+	private Socket 			connection = null;
+	ObjectOutputStream 		out;
+	ObjectInputStream 		in;
+	String 					message;
+	BufferedReader 		reader = null;
+	InputStreamReader   isr = null;
 	A(){}
 	void run()
 	{
@@ -26,18 +28,26 @@ public class A{
 			out.flush();
 			in = new ObjectInputStream(connection.getInputStream());
 			sendMessage("Connection successful");
+			String yourmessage = "";
 			//4. The two parts communicate via the input and output streams
 			do{
 				try{
-					message = (String)in.readObject();
-					System.out.println("client>" + message);
-					if (message.equals("bye"))
-						sendMessage("bye");
+					yourmessage = (String)in.readObject();
+					System.out.println("server>" + yourmessage);
+					sendMessage("Hi my server");
+					reader = new BufferedReader(isr = new InputStreamReader(System.in));
+					
+					yourmessage = reader.readLine();
+					sendMessage(yourmessage);
+//					sendMessage(message);
 				}
-				catch(ClassNotFoundException classnot){
-					System.err.println("Data received in unknown format");
+				catch(ClassNotFoundException classNot){
+					System.err.println("data received in unknown format");
 				}
-			}while(!message.equals("bye"));
+			}while(!yourmessage.equals("bye"));
+		}
+		catch(UnknownHostException unknownHost){
+			System.err.println("You are trying to connect to an unknown host!");
 		}
 		catch(IOException ioException){
 			ioException.printStackTrace();
@@ -65,11 +75,40 @@ public class A{
 			ioException.printStackTrace();
 		}
 	}
-	public static void main(String args[])
+	
+	String getLocalIP(String host){
+		InetAddress inet = null;
+		try {
+			inet = InetAddress.getByName(host);
+		} catch (UnknownHostException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+//		System.out.println( inet.getCanonicalHostName() );
+//		System.out.println( inet.getHostAddress() );
+//		System.out.println( inet.toString() );
+		return inet.getHostAddress();
+	}
+	
+	public static void main(String args[]) throws UnknownHostException
 	{
 		A server = new A();
+		
 		while(true){
 			server.run();
+			
+			System.out.println( server.getLocalIP("SYNCMASTER-PC"));
+			
+//			boolean istAn = true;
+//			try {
+//				istAn = InetAddress.getByName( "192.168.1.7" ).isReachable(3000);
+//				System.out.println(istAn);
+//			} catch (IOException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}
 		}
+		
+		
 	}
 }
