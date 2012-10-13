@@ -18,7 +18,7 @@ public class B{
 	{
 		try{
 			//1. creating a socket to connect to the server
-			requestSocket = new Socket("localhost", 6665);
+			requestSocket = new Socket("192.168.1.7", 6665);
 			System.out.println("Connected to localhost in port 6665");
 			//2. get Input and Output streams
 			out = new ObjectOutputStream(requestSocket.getOutputStream());
@@ -30,7 +30,7 @@ public class B{
 				try{
 					yourmessage = (String)in.readObject();
 					System.out.println("server>" + yourmessage);
-					sendMessage("Hi my server");
+//					sendMessage("Hi my server");
 					reader = new BufferedReader(isr = new InputStreamReader(System.in));
 					
 					yourmessage = reader.readLine();

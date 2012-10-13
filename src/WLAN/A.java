@@ -27,14 +27,14 @@ public class A{
 			out = new ObjectOutputStream(connection.getOutputStream());
 			out.flush();
 			in = new ObjectInputStream(connection.getInputStream());
-			sendMessage("Connection successful");
+			sendMessage("Connection successful \n");
 			String yourmessage = "";
 			//4. The two parts communicate via the input and output streams
 			do{
 				try{
 					yourmessage = (String)in.readObject();
 					System.out.println("server>" + yourmessage);
-					sendMessage("Hi my server");
+//					sendMessage("Hi my server");
 					reader = new BufferedReader(isr = new InputStreamReader(System.in));
 					
 					yourmessage = reader.readLine();
