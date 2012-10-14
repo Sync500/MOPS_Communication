@@ -1,106 +1,118 @@
-/**
- * 
- */
 package WLAN;
 
 import java.io.*;
 import java.net.*;
+
 public class WLAN_Server{
-	private ServerSocket 	providerSocket;
-	private Socket 			connection = null;
-	ObjectOutputStream 		out;
-	ObjectInputStream 		in;
-	String 					message;
-	BufferedReader 		reader = null;
-	InputStreamReader   isr = null;
+	private static ServerSocket 	providerSocket;
+	private static Socket 			connection = null;
+	private static ObjectOutputStream 		out;
+	static ObjectInputStream 		in;
+	private static BufferedReader 		reader = null;
+	private static InputStreamReader   isr = null;
 	
-	final int port = 6665;
-	final String host = "192.168.1.7";
+	final static int port = 6665;
+	final static String host = "192.168.1.7";
 	
-	WLAN_Server(){
-		
-		connectServerSocket();
-		WaitForClient();
-		createStreams(connection);
-				
+	WLAN_Server(){				
 	}
 	
-	void connectServerSocket(){
+	public static void connectServerSocket() throws InterruptedException{
 		try {
 			providerSocket = new ServerSocket(port);
+			WaitForClient();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
-			System.out.println("ServerSocket dont create" + e.getMessage());
+			System.out.println("ServerSocket dont create" + e.getMessage() +  "\n");
+			connectServerSocket();
+			WaitForClient();
 		}
 	}
 	
-	void WaitForClient(){
-		System.out.println("Waiting for connection");
+	public static void WaitForClient(){
+		System.out.println("Waiting for Client");
 		try {
 			connection = providerSocket.accept();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			System.out.println("Client dont response" + e.getMessage());
 		}
-		System.out.println("Connection received from " + connection.getInetAddress().getHostName());
+		System.out.println("Connection received from " + connection.getInetAddress().getHostName() +  "\n");
 	}
 	
-	void createStreams(Socket connection){
+	public static void createStreams(Socket connection) throws ClassNotFoundException{
 		try {
 			out = new ObjectOutputStream(connection.getOutputStream());
 			in = new ObjectInputStream(connection.getInputStream());
+			
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
-			System.out.println("server - Streams dont created" + e.getMessage());
+			System.out.println("server - Streams dont created" + e.getMessage() +  "\n");
 		}
-		sendMessage("Connection and Streams successful \n");
+		sendMessage("server - Connection and Streams successful \n");
+	}
+	
+	public static void sendObject(Data data) throws IOException, ClassNotFoundException{
+		try{
+//			data = (Data) in.readObject(); // read serialize class/object - generate new object and cast 
+//			System.out.println("From SOCKET: \n" + data.getOBject_message()); // show message from client
+			//System.out.println("Server " + in.setMessage());
+//			System.out.println("From SOCKET:" + data.getObject_calculatet()); // show message from client
+		
+			out.writeObject(data);
+			System.out.println("Server say: successful");
+			closeConnection(); // end: client closed - connection lost
+		}catch(IOException ioException){
+			System.out.println("server - I/Output is clear" + ioException.getMessage() +  "\n");
+		}
 	}
 	
 	
 	
-	void sendMessage(String msg){
+	public static void sendMessage(String msg) throws ClassNotFoundException{
+		String yourmessage = "";
 		try{
-			out.writeObject(msg);
-			out.flush();
-			System.out.println("server>" + msg);
+			if (out != null){
+				out.writeObject(msg);
+				out.flush();
+//				System.out.println("server>" + msg);
+				yourmessage = (String)in.readObject();
+				System.out.println("server>" + yourmessage);
+			}
 		}
 		catch(IOException ioException){
-			ioException.printStackTrace();
+			System.out.println("server - Output is clear" + ioException.getMessage() +  "\n");
+		}
+		
+	}
+	
+	public static void yourInput() throws IOException, ClassNotFoundException{
+		while(true){
+			String userInput = null;
+			reader = new BufferedReader(isr = new InputStreamReader(System.in));
+			
+			userInput = reader.readLine();
+			
+			if(userInput.equals("exit")){ // with exit -  connection end
+				System.out.println("close connection");
+				break;
+			}else{
+				System.out.println("Message from Server is: " + userInput.toUpperCase());
+				out.writeObject(userInput+"\n");
+				out.flush();
+			} // if
 		}
 	}
 	
-	void yourInput(){
-		String yourmessage = "";
-		reader = new BufferedReader(isr = new InputStreamReader(System.in));
-			try {
-				try {
-					yourmessage = (String)in.readObject();
-					System.out.println("server>" + yourmessage);
-				} catch (ClassNotFoundException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-
-				yourmessage = reader.readLine();
-				sendMessage(yourmessage);
-				if (!yourmessage.equals("bye")) {closeConnection();}
-				
-	//			yourmessage = (String)in.readObject();
-				
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-	}
-	
-	void closeConnection(){
+	public static void closeConnection(){
 		try{
 			in.close();
 			out.close();
 			providerSocket.close();
+			System.out.println("server - Connection OFF");
 		}
 		catch(IOException ioe){
-			System.out.println("Connection isnt closed" + ioe.getMessage());
+			System.out.println("Connection isnt closed" + ioe.getMessage() + "\n");
 		}
 	}
 	
@@ -118,19 +130,45 @@ public class WLAN_Server{
 		return inet.getHostAddress();
 	}
 	
-	public static void main(String args[]) throws UnknownHostException
+	public static boolean connectionState(String host, int timeout){
+		boolean istAn = true;
+		try {
+			istAn = InetAddress.getByName( host ).isReachable(timeout);
+			if (istAn == false){
+				System.out.println("Connection is OFF");
+				return false;
+			}
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		System.out.println("Connection is ON");
+		return true;
+	}
+	
+	public static void main(String args[]) throws ClassNotFoundException, IOException, InterruptedException
 	{
 		WLAN_Server server = new WLAN_Server();
-					
-			System.out.println( server.getLocalIP("SYNCMASTER-PC"));
-			
-			boolean istAn = true;
-			try {
-				istAn = InetAddress.getByName( "192.168.1.7" ).isReachable(3000);
-				System.out.println(istAn);
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+
+		connectServerSocket();
+		createStreams(connection);
+
+		System.out.println( server.getLocalIP("SYNCMASTER-PC"));
+		connectionState("192.168.1.5", 1000);
+		Data data = new Data();
+		sendObject(data);
+		
+		
+//		String yourmessage = "";
+//		reader = new BufferedReader(isr = new InputStreamReader(System.in));
+//		sendMessage("Your Input is: ");
+//		System.out.println("Wait for Message from Client");
+//		do{
+//			yourmessage = reader.readLine();
+//			sendMessage(yourmessage);
+//			
+//		}while(!yourmessage.equals("end"));
+//		closeConnection();
+//		connectServerSocket();
 	}
 }
