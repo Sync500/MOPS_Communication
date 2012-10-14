@@ -5,7 +5,7 @@ package WLAN;
 
 import java.io.*;
 import java.net.*;
-public class A_acer{
+public class WLAN_Server{
 	private ServerSocket 	providerSocket;
 	private Socket 			connection = null;
 	ObjectOutputStream 		out;
@@ -17,7 +17,7 @@ public class A_acer{
 	final int port = 6665;
 	final String host = "192.168.1.7";
 	
-	A_acer(){
+	WLAN_Server(){
 		
 		connectServerSocket();
 		WaitForClient();
@@ -120,7 +120,7 @@ public class A_acer{
 	
 	public static void main(String args[]) throws UnknownHostException
 	{
-		A_acer server = new A_acer();
+		WLAN_Server server = new WLAN_Server();
 					
 			System.out.println( server.getLocalIP("SYNCMASTER-PC"));
 			

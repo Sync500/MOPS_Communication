@@ -7,7 +7,7 @@ import java.io.*;
 import java.net.*;
 import java.util.Scanner;
 
-public class B_acer{
+public class WLAN_Client{
 	private static Socket 					requestSocket;
 	private static ObjectOutputStream 		out;
  	private static ObjectInputStream 		in;
@@ -17,7 +17,7 @@ public class B_acer{
 	final static int 						port = 6665;
 	final static String 					host = "192.168.1.7";
 	
-	B_acer(){
+	WLAN_Client(){
 //		connectSocket();
 //		createStreams(requestSocket);
 //		yourInput();
@@ -169,7 +169,7 @@ public class B_acer{
 	
 	public static void main(String args[]) throws IOException, ClassNotFoundException, InterruptedException
 	{
-		B_acer client = new B_acer();	
+		WLAN_Client client = new WLAN_Client();	
 		System.out.println(getMacAddress());
 //		connectSocket();
 		connectWithTimeOut(3000);
