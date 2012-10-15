@@ -7,12 +7,12 @@ public class WLAN_Server{
 	private static ServerSocket 	providerSocket;
 	private static Socket 			connection = null;
 	private static ObjectOutputStream 		out;
-	static ObjectInputStream 		in;
+	private static ObjectInputStream 		in;
 	private static BufferedReader 		reader = null;
 	private static InputStreamReader   isr = null;
 	
 	final static int port = 6665;
-	final static String host = "192.168.1.7";
+	final static String host = "192.168.1.5";
 	
 	WLAN_Server(){				
 	}
@@ -52,7 +52,7 @@ public class WLAN_Server{
 		sendMessage("server - Connection and Streams successful \n");
 	}
 	
-	public static void sendObject(Data data) throws IOException, ClassNotFoundException{
+	public static void sendObject(Data data) throws IOException, ClassNotFoundException, InterruptedException{
 		try{
 //			data = (Data) in.readObject(); // read serialize class/object - generate new object and cast 
 //			System.out.println("From SOCKET: \n" + data.getOBject_message()); // show message from client
@@ -66,8 +66,6 @@ public class WLAN_Server{
 			System.out.println("server - I/Output is clear" + ioException.getMessage() +  "\n");
 		}
 	}
-	
-	
 	
 	public static void sendMessage(String msg) throws ClassNotFoundException{
 		String yourmessage = "";
@@ -104,12 +102,14 @@ public class WLAN_Server{
 		}
 	}
 	
-	public static void closeConnection(){
+	public static void closeConnection() throws InterruptedException{
 		try{
 			in.close();
 			out.close();
 			providerSocket.close();
 			System.out.println("server - Connection OFF");
+			System.out.println("Establish New Connection");
+			connectServerSocket();
 		}
 		catch(IOException ioe){
 			System.out.println("Connection isnt closed" + ioe.getMessage() + "\n");
