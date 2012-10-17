@@ -47,7 +47,7 @@ public class connect implements Serializable {
 	void sendObject(Socket socket){
 		try{
 			objInput = new ObjectInputStream(socket.getInputStream()); // return Input
-			TestData in =  (TestData) objInput.readObject(); // read serialize class/object - generate new object and cast 
+			Data in =  (Data) objInput.readObject(); // read serialize class/object - generate new object and cast 
 			
 			System.out.println("Server " + in.setMessage());
 			

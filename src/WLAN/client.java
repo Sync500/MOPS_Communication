@@ -6,7 +6,6 @@ package WLAN;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.io.PrintStream;
 import java.io.Serializable;
 import java.net.Socket;
 
@@ -44,7 +43,7 @@ public class client implements Serializable {
 	void sendObject(Socket socket){
 		try{
 			objInput = new ObjectInputStream(socket.getInputStream()); // return Input
-			TestData in =  (TestData) objInput.readObject(); // read serialize class/object - generate new object and cast 
+			Data in =  (Data) objInput.readObject(); // read serialize class/object - generate new object and cast 
 			
 			System.out.println("Server " + in.setMessage());
 			
