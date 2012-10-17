@@ -1,174 +1,269 @@
+/**
+ * @author Daniel Fay
+ * @version 1.0
+ */
+
 package WLAN;
 
 import java.io.*;
 import java.net.*;
+import java.util.Date;
 
 public class WLAN_Server{
-	private static ServerSocket 	providerSocket;
-	private static Socket 			connection = null;
-	private static ObjectOutputStream 		out;
-	private static ObjectInputStream 		in;
-	private static BufferedReader 		reader = null;
-	private static InputStreamReader   isr = null;
+	/**
+	 *  @description: set member variable for this class
+	 */
+	private static ServerSocket 					server = null;
+	private static Socket 							socket = null;
+	private static ObjectOutputStream 				out;
+	private static ObjectInputStream 				in;
+	private static DataOutputStream					outByte;
+//	private static BufferedReader 					reader;
+//	private static InputStreamReader   				isr;
 	
 	final static int port = 6665;
 	final static String host = "192.168.1.5";
 	
-	WLAN_Server(){				
-	}
+	WLAN_Server(){}
 	
-	public static void connectServerSocket() throws InterruptedException{
+	/**
+	 * 
+	 */
+	public static void connectServerSocket(){
 		try {
-			providerSocket = new ServerSocket(port);
+			server = new ServerSocket(port);
 			WaitForClient();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
-			System.out.println("ServerSocket dont create" + e.getMessage() +  "\n");
-			connectServerSocket();
-			WaitForClient();
+			System.out.println("ServerSocket dont create: " + e.getMessage() +  "\n");
 		}
 	}
 	
+	/**
+	 * 
+	 */
 	public static void WaitForClient(){
 		System.out.println("Waiting for Client");
 		try {
-			connection = providerSocket.accept();
+			socket = server.accept();
+			Thread.sleep(1000);
+			createStreams(socket);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
-			System.out.println("Client dont response" + e.getMessage());
-		}
-		System.out.println("Connection received from " + connection.getInetAddress().getHostName() +  "\n");
+			System.out.println("Client dont response: " + e.getMessage());
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			System.out.println("Exception in WaitForClient: " + e.getMessage());
+		} 
+		System.out.println("Socket received from " + socket.getInetAddress().getHostName());
+		connectionState(socket);
 	}
 	
-	public static void createStreams(Socket connection) throws ClassNotFoundException{
+	/**
+	 * @param socket
+	 * @throws ClassNotFoundException
+	 */
+	public static void createStreams(Socket socket){
 		try {
-			out = new ObjectOutputStream(connection.getOutputStream());
-			in = new ObjectInputStream(connection.getInputStream());
-			
+			out = new ObjectOutputStream(socket.getOutputStream());
+			in = new ObjectInputStream(socket.getInputStream());
+			outByte = new DataOutputStream(socket.getOutputStream());
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
-			System.out.println("server - Streams dont created" + e.getMessage() +  "\n");
+			System.out.println("server> Streams dont created: " + e.getMessage() +  "\n");
+			closeConnection();
 		}
-		sendMessage("server - Connection and Streams successful \n");
 	}
 	
-	public static void sendObject(Data data) throws IOException, ClassNotFoundException, InterruptedException{
-		try{
-//			data = (Data) in.readObject(); // read serialize class/object - generate new object and cast 
-//			System.out.println("From SOCKET: \n" + data.getOBject_message()); // show message from client
-			//System.out.println("Server " + in.setMessage());
-//			System.out.println("From SOCKET:" + data.getObject_calculatet()); // show message from client
+	/**
+	   * send a blob of data. Sending may fail without notice or with exception. 
+	   * @param data  data to send
+	   * @throws IOException  on exception or failure in underlying protocol
+	   */
+	public static void sendByteArray(byte[] data){
+		send(data, 0, data.length);
+	}
+	
+	/**
+	 * @param ByteArray
+	 * @param start point of the array
+	 * @param len of the passed ByteArray
+	 * @throws IOException or IllegalArgumentException or IndexOutOfBoundsException
+	 */
+	public static void send(byte[] ByteArray, int start, int len){
+		//	check length of the array and her IndexBound	
+		//  maybe others checks are necessary
+		if (len < 0){
+			throw new IllegalArgumentException("The length of the Array cannot be negative");
+		}
+		if (start < 0 || start >= ByteArray.length){
+	        throw new IndexOutOfBoundsException("Your value is: Out of bounds: " + start);
+		}
 		
+		try{
+			// send ByteArray Length and the content to receiver
+			outByte.writeInt(len);
+//			System.out.println("Length is: " + len);
+			if (len > 0){
+				outByte.write(ByteArray, start, len);
+				System.out.println("Sending ByteArray - complete");
+			}
+		}catch (IOException ioe){
+			ioe.getMessage();
+		}
+		
+	}
+	  
+	  /**
+	   * send a blob of data and block until success or failure is signaled.
+	   * @param data data to send
+	   * @throws IOException, InterruptedException on failure
+	   */
+	public static void sendWait(byte[] data, int timeout){
+		try {
+			System.out.println("Timeout is: " + timeout);
+			send(data, 0, data.length);
+			Thread.sleep(timeout);
+			System.out.println("Sending Data - complete");
+			
+		} catch (InterruptedException ie) {
+			System.out.println("Exception in sendWait: " + ie.getMessage());
+		}
+	}
+	  
+	/**
+	 * @param data - ByteArray 
+	 * @throws IOException
+	 * @throws ClassNotFoundException
+	 * @throws InterruptedException
+	 */
+	public static void sendObject(Data data) {
+		try{
 			out.writeObject(data);
+			out.flush();
+			out.close();
 			System.out.println("Server say: successful");
-			closeConnection(); // end: client closed - connection lost
 		}catch(IOException ioException){
-			System.out.println("server - I/Output is clear" + ioException.getMessage() +  "\n");
+			System.out.println("server> I/Output is empty: " + ioException.getMessage() +  "\n");
+			closeConnection();
 		}
 	}
 	
-	public static void sendMessage(String msg) throws ClassNotFoundException{
+	/**
+	 * @param msg - get messages from to receiver
+	 * @throws ClassNotFoundException
+	 * @throws IOException
+	 */
+	public static void getMessage(String msg){
 		String yourmessage = "";
 		try{
-			if (out != null){
-				out.writeObject(msg);
-				out.flush();
-//				System.out.println("server>" + msg);
+			if (in != null){
 				yourmessage = (String)in.readObject();
 				System.out.println("server>" + yourmessage);
 			}
 		}
 		catch(IOException ioException){
-			System.out.println("server - Output is clear" + ioException.getMessage() +  "\n");
-		}
-		
+			ioException.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.getMessage();
+		}	
 	}
 	
-	public static void yourInput() throws IOException, ClassNotFoundException{
-		while(true){
-			String userInput = null;
-			reader = new BufferedReader(isr = new InputStreamReader(System.in));
-			
-			userInput = reader.readLine();
-			
-			if(userInput.equals("exit")){ // with exit -  connection end
-				System.out.println("close connection");
-				break;
-			}else{
-				System.out.println("Message from Server is: " + userInput.toUpperCase());
-				out.writeObject(userInput+"\n");
+	/**
+	 * @param msg - this message will send to receiver
+	 * @throws ClassNotFoundException
+	 */
+	public static void sendMessage(String msg) throws ClassNotFoundException{
+		try{
+			if (out != null){
+				out.writeObject(msg);
 				out.flush();
-			} // if
+				System.out.println("server>" + msg);
+			}
 		}
+		catch(IOException ioException){
+			System.out.println("server> Output is clear" + ioException.getMessage() +  "\n");
+		}	
 	}
 	
-	public static void closeConnection() throws InterruptedException{
+	/**
+	 * @throws InterruptedException
+	 */
+	public static void closeConnection(){
 		try{
 			in.close();
 			out.close();
-			providerSocket.close();
-			System.out.println("server - Connection OFF");
-			System.out.println("Establish New Connection");
-			connectServerSocket();
+			outByte.close();
+			server.close();
+			socket.close();
+			System.out.println("server> Connection OFF");
 		}
 		catch(IOException ioe){
-			System.out.println("Connection isnt closed" + ioe.getMessage() + "\n");
+			System.out.println( ioe.getMessage() );
 		}
 	}
 	
-	String getLocalIP(String host){
-		InetAddress inet = null;
-		try {
-			inet = InetAddress.getByName(host);
-		} catch (UnknownHostException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-//		System.out.println( inet.getCanonicalHostName() );
-//		System.out.println( inet.getHostAddress() );
-//		System.out.println( inet.toString() );
-		return inet.getHostAddress();
-	}
 	
-	public static boolean connectionState(String host, int timeout){
+	/**  check the state of the socket connection 
+	 * 
+	 * @return boolean
+	 */
+	public static boolean connectionState(Socket socket){
 		boolean istAn = true;
-		try {
-			istAn = InetAddress.getByName( host ).isReachable(timeout);
-			if (istAn == false){
-				System.out.println("Connection is OFF");
-				return false;
-			}
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+//		istAn = InetAddress.getByName( host ).isReachable(timeout);
+		istAn = socket.isConnected();
+		
+		if (istAn == false){
+			System.out.println("Connection is: " + socket.isConnected());
+			closeConnection();
+			return false;
 		}
-		System.out.println("Connection is ON");
+		System.out.println("Connection is: " + socket.isConnected());
 		return true;
 	}
 	
-	public static void main(String args[]) throws ClassNotFoundException, IOException, InterruptedException
+	
+	/**
+	 * @param args
+	 * @throws ClassNotFoundException
+	 * @throws IOException
+	 * @throws InterruptedException
+	 */
+	public static void main(String args[]) throws IOException, InterruptedException
 	{
-		WLAN_Server server = new WLAN_Server();
-
-		connectServerSocket();
-		createStreams(connection);
-
-		System.out.println( server.getLocalIP("SYNCMASTER-PC"));
-		connectionState("192.168.1.5", 1000);
-		Data data = new Data();
-		sendObject(data);
-		
-		
-//		String yourmessage = "";
-//		reader = new BufferedReader(isr = new InputStreamReader(System.in));
-//		sendMessage("Your Input is: ");
-//		System.out.println("Wait for Message from Client");
-//		do{
-//			yourmessage = reader.readLine();
-//			sendMessage(yourmessage);
-//			
-//		}while(!yourmessage.equals("end"));
-//		closeConnection();
-//		connectServerSocket();
+			//		WLAN_Server server = new WLAN_Server();
+			connectServerSocket();
+			byte b[] = new byte[4];
+			b[0] = 12;
+		    b[1] = 11;
+		    b[2] = 123;
+		    
+		    byte c[] = new byte[4];
+		    c[0] = 20;
+		    
+		    boolean isCon;
+		    isCon = socket.isConnected();
+		    
+		    while(isCon == true){
+			    sendByteArray(b); 
+			    Thread.sleep(2000);
+			    
+			    sendByteArray(c);
+			    Thread.sleep(2000);
+//			    
+			    Data data = new Data();
+			    sendObject(data);
+			    System.out.println("Send complete");
+			    Thread.sleep(2000);
+			    connectionState(socket);
+			    
+			    System.out.println("SendToWait");
+			    sendWait(b,2000);
+			    isCon=false;
+			}
+		    System.out.println(server.isClosed());
+		    closeConnection();
+		    System.out.println(server.isClosed());
 	}
 }
