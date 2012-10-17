@@ -1,6 +1,7 @@
 /**
  * @author Daniel Fay
  * @version 1.0
+ * @date: 17.10.2012 - 03:46
  */
 
 package WLAN;
