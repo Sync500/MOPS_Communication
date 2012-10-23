@@ -15,7 +15,7 @@ import java.net.Socket;
  * @version 1.0
  *
  */
-public class Communication {
+public class Communication_ {
 	
 	static ServerSocket 		serverSocket = null;
 	static Socket 				clientSocket = null;
@@ -95,7 +95,7 @@ class runServer extends Thread{
 			try{
 					clientSocket = serverSocket.accept(); // wait on client
 					System.out.println("Socket create");
-					Communication com = new Communication();
+					Communication_ com = new Communication_();
 					System.out.println("Status is: " + com.getStatus(clientSocket));
 					
 					 // generate object - OutputStream with autoFlush
