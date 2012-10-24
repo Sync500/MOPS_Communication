@@ -3,11 +3,12 @@
  * @version 1.0
  * @date: 17.10.2012 - 17:00
  */
-package WLAN;
+package WLAN.oldFiles;
 
 import java.io.*;
 import java.net.*;
 import java.util.Arrays;
+
 
 /**
  *  @description: set member variable

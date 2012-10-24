@@ -4,10 +4,11 @@
  * @date: 17.10.2012 - 17:00
  */
 
-package WLAN;
+package WLAN.oldFiles;
 
 import java.io.*;
 import java.net.*;
+
 
 public class WLAN_Server_old{
 	/**

@@ -1,4 +1,4 @@
-package WLAN;
+package WLAN.oldFiles;
 
 import java.io.IOException;
 import java.io.InputStream;

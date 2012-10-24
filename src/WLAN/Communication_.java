@@ -67,7 +67,7 @@ public class Communication_ {
 	
 } // communication
 
-class Server extends Thread{
+class runServer extends Thread{
 	
 	/**
 	 * set all var. with default value null
