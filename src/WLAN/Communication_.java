@@ -67,7 +67,7 @@ public class Communication_ {
 	
 } // communication
 
-class runServer extends Thread{
+class Server extends Thread{
 	
 	/**
 	 * set all var. with default value null
@@ -79,7 +79,7 @@ class runServer extends Thread{
 	BufferedReader 		reader = null;
 	final int			port = 6665; // dont use port 1-2000
 	
-	runServer(){	
+	public void run(){	
 		try {
 			serverSocket = new ServerSocket(port);
 		} catch (IOException e) {
@@ -87,8 +87,7 @@ class runServer extends Thread{
 		} // generate object for sockets
 	}
 	
-	@Override
-	public void run(){
+	public void running(){
 		System.out.println("Waiting");
 		
 		while(true){
