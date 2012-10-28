@@ -31,6 +31,7 @@ public class clientSocket implements Serializable {
 	
 	clientSocket(){
 		try{
+			@SuppressWarnings("resource")
 			Socket clientSocket = new Socket("localhost",port); // create the Socket - parameters: localhost and listen on port 6665
 			
 			TestData po = new TestData(); // instance of the serialize class

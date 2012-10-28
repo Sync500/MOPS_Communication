@@ -27,6 +27,7 @@ public class _ClientConnect extends Thread {
 	String				host ="192.168.1.4";
 	int 				port = 6665;
 	
+	@SuppressWarnings("resource")
 	_ClientConnect() throws IOException{
 		try{
 			// create the Socket - parameters: localhost and listen on port

@@ -12,13 +12,13 @@ import java.util.logging.Logger;
 /**
  * @author Daniel
  * @version 1.0
- * @date: 25.10.2012 - 18:00
+ * @date: 25.10.2012
  */
-public class ConnectionHandling {
+public class ConnectionHandler {
 
 	private static Socket socket = null;
 	private static ServerSocket server = null;
-	private static final Logger log = Logger.getLogger(Logger.class.getName());
+	private static final Logger log = Logger.getLogger(ConnectionHandler.class.getName());
 	/**
 	 * check the state of the socket connection show state of the connection
 	 * 

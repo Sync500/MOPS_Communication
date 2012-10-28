@@ -12,7 +12,7 @@ import java.util.logging.Logger;
 /**
  * @author Daniel
  * @version 1.0
- * @date: 25.10.2012 - 18:00
+ * @date: 26.10.2012
  */
 public class Send_Read {
 	
@@ -67,7 +67,7 @@ public class Send_Read {
 	}
 
 	/**
-	 * send a blob of data and block until success or failure is signaled
+	 * send a blob of data and break until unsuccessful or failure is signaled
 	 * 
 	 * @param data
 	 *            data to send

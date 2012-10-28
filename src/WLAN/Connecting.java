@@ -17,7 +17,7 @@ import java.util.logging.Logger;
 /**
  * @author Daniel
  * @version 1.0
- * @date: 25.10.2012 - 18:00
+ * @date: 26.10.2012
  */
 public class Connecting {
 
@@ -25,7 +25,7 @@ public class Connecting {
 	private static ServerSocket server = null;
 	private static DataInputStream in;
 	private static DataOutputStream out;
-	private static final Logger log = Logger.getLogger(Logger.class.getName());
+	private static final Logger log = Logger.getLogger(Connecting.class.getName());
 	final static int port = 6665;
 	final static String host = "192.168.1.7";
 	
@@ -57,12 +57,12 @@ public class Connecting {
 	 *             if Server don't response then connect again
 	 */
 	public static void connectWithTimeOut(int timeout) {
-		log.log(Level.WARNING, "Timeout is: " + timeout);
+//		log.log(Level.WARNING, "Timeout is: " + timeout);
 		SocketAddress sockaddr = new InetSocketAddress(host, port);
 		socket = new Socket();
 		try {
 			socket.connect(sockaddr, timeout);
-			createStreams(socket);
+			createStreams();
 		} catch (IOException e) {
 			log.log(Level.WARNING, "Server dont response");
 			connectWithTimeOut(timeout);
@@ -100,7 +100,7 @@ public class Connecting {
 		System.out.println("Waiting for Client");
 		try {
 			socket = server.accept(); // throw IOException
-			createStreams(socket); // throw IOException
+			createStreams(); // throw IOException
 		} catch (IOException e) {
 			log.log(Level.WARNING, "Client dont response: " + e.getMessage());
 		}
@@ -118,7 +118,7 @@ public class Connecting {
 	 *             if an I/O error occurs when creating the output stream or if
 	 *             the socket is not connected
 	 */
-	public static void createStreams(Socket socket) {
+	public static void createStreams() {
 		try {
 			in = new DataInputStream(socket.getInputStream());
 			out = new DataOutputStream(socket.getOutputStream());
