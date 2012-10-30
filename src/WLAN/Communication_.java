@@ -82,6 +82,7 @@ class runServer extends Thread{
 	public void run(){	
 		try {
 			serverSocket = new ServerSocket(port);
+			System.out.println("Socket created");
 		} catch (IOException e) {
 			e.printStackTrace();
 		} // generate object for sockets

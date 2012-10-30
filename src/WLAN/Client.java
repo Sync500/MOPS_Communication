@@ -3,75 +3,67 @@
  */
 package WLAN;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Arrays;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import WLAN.oldFiles.Data;
 
 /**
  * @author Daniel
  * @version 1.0
- * @date: 26.10.2012
+ * @date: 30.10.2012
  */
+
 public class Client extends Thread {
-	private static Socket socket = null;
-	private static ServerSocket server = null;
-	
-	Client()throws IOException{
-		
-	}
 	/**
-	 * @param args
+	 * initialization of the member var.
+	 * 
 	 */
-	public void run(){
-		int i=0;
+
+	private static Socket socket;
+	private static DataInputStream input = null;
+	private static DataOutputStream output = null;
+	private static final Logger log = Logger.getLogger(Client.class.getName());
+
+	/**
+	 * Constructor generate ClientSocket with I/O-Streams
+	 * 
+	 * @throws IOException
+	 *             Signals that an I/O exception of some sort has occurred
+	 */
+	Client() throws IOException {
+		socket = Connecting.connectSocket();
+		input = Connecting.createInputStream(socket);
+		output = Connecting.createOutputStream(socket);
+		// System.out.println("Socket and streams created - client");
+	}
+
+	/**
+	 * Test
+	 */
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.lang.Thread#run()
+	 */
+	public void run() {
+
 		byte b[] = new byte[4];
 		b[0] = 12;
 		b[1] = 11;
 		b[2] = 123;
-		try{
-			System.out.println("From Client i is now: " + i);
-			Connecting.connectWithTimeOut(2000);
-			System.out.println("Client is connect");
-			ConnectionHandler.sleep(2000);
-			System.out.println("Your Socket is open");
-			
-			Send_Read.sendByteArray(b);
-			System.out.println("Sending Data...");
-			ConnectionHandler.sleep(2000);
-			i++;
-		}catch(Exception e){
+		try {
+			Send_Read.sendByteArray(b, output);
+			System.out.println("Sending Data complete");
+		} catch (Exception e) {
 			System.out.println("Socket not accessible!");
 			System.exit(1);
-			
 		} // catch
-		
-		System.out.println("Connection ready. Transfer your Data!");
-		
-		
-		
-//		boolean isCon;
-//		isCon = socket.isConnected();
-//		
-//		while(true){
-//			System.out.println(Arrays.toString(Send_Read.read()));
-//			ConnectionHandler.sleep(2000);
-//			System.out.println("Transfer your Data");
-//			System.out.println(Arrays.toString(Send_Read.read()));
-//			
-//			if(socket.isClosed() == true){
-//				System.out.println("Your Socket is closed");
-//				ConnectionHandler.closeConnection();
-//				Connecting.connectWithTimeOut(2000);
-//			}
-//			
-//			System.out.println("\n Content of sendWait");
-//			System.out.println(Arrays.toString(Send_Read.read()));
-//			isCon = false;
-//			ConnectionHandler.closeConnection();
-//		}
-	}
-
+	} // run
 }

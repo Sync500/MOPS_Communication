@@ -17,18 +17,19 @@ import java.util.logging.Logger;
 /**
  * @author Daniel
  * @version 1.0
- * @date: 26.10.2012
+ * @date: 30.10.2012
  */
 public class Connecting {
 
-	private static Socket socket = null;
+	private static Socket socket;
 	private static ServerSocket server = null;
 	private static DataInputStream in;
 	private static DataOutputStream out;
-	private static final Logger log = Logger.getLogger(Connecting.class.getName());
+	private static final Logger log = Logger.getLogger(Connecting.class
+			.getName());
 	final static int port = 6665;
-	final static String host = "192.168.1.7";
-	
+	final static String host = "localhost";
+
 	// Client Implementation Begin
 	/**
 	 * connecting to Server without timeout
@@ -37,14 +38,18 @@ public class Connecting {
 	 *             if the IP/host address of the host could not be determined
 	 * @throws IOException
 	 *             if an I/O error occurs when creating the socket
+	 * @return clientSocket
 	 */
-	public static void connectSocket() throws UnknownHostException {
+	public static Socket connectSocket() throws UnknownHostException {
 		try {
 			socket = new Socket(host, port);
-			log.log(Level.WARNING, "Connect to Server");
+			log.log(Level.INFO, "Connect to Server successful");
+			return socket;
 		} catch (IOException e) {
-			log.log(Level.WARNING, "Socket dont create: " + e.getMessage()
-					+ "\n");
+			log.log(Level.WARNING,
+					"ClientSocket dont create: " + e.getMessage() + "\n");
+			e.printStackTrace();
+			return null;
 		}
 	}
 
@@ -55,76 +60,107 @@ public class Connecting {
 	 *            set timeout if Server don't response
 	 * @throws IOException
 	 *             if Server don't response then connect again
+	 * @return clientSocket
 	 */
-	public static void connectWithTimeOut(int timeout) {
-//		log.log(Level.WARNING, "Timeout is: " + timeout);
+	public static Socket connectWithTimeOut(int timeout, Socket socket) {
+		// log.log(Level.WARNING, "Timeout is: " + timeout);
 		SocketAddress sockaddr = new InetSocketAddress(host, port);
 		socket = new Socket();
 		try {
 			socket.connect(sockaddr, timeout);
-			createStreams();
+			return socket;
 		} catch (IOException e) {
 			log.log(Level.WARNING, "Server dont response");
-			connectWithTimeOut(timeout);
 		}
+		return null;
 	}
 
 	// Client Implementation End
 
 	// Server Implementation Begin
 	/**
-	 * @description: create ServerSocket and wait for client
+	 * generate ServerSocket and wait for client
+	 * 
 	 * @throws IOException
 	 *             - if an I/O error occurs when opening the socket
-	 * 
+	 * @return Socket
 	 */
-	public static void connectServerSocket() {
+	public static Socket connectServerSocket() {
 		try {
 			server = new ServerSocket(port); // throw IOException
-			WaitForClient();
+			socket = WaitForClient();
+			return socket;
 		} catch (IOException e) {
 			log.log(Level.WARNING,
 					"ServerSocket dont create: " + e.getMessage() + "\n");
+			e.printStackTrace();
+			return null;
 		}
 	}
 
 	/**
-	 * @description: Server wait for response from client
+	 * Server wait for response from client
+	 * 
 	 * @throws IOException
 	 *             - if an I/O error occurs when waiting for a connection if an
 	 *             I/O error occurs when creating the output stream or if the
 	 *             socket is not connected
+	 * @return Socket
 	 * 
 	 */
-	public static void WaitForClient() {
-		System.out.println("Waiting for Client");
+	public static Socket WaitForClient() {
+		log.log(Level.INFO, "Waiting for Client");
 		try {
 			socket = server.accept(); // throw IOException
-			createStreams(); // throw IOException
+			return socket;
 		} catch (IOException e) {
 			log.log(Level.WARNING, "Client dont response: " + e.getMessage());
+			e.printStackTrace();
 		}
-		log.log(Level.WARNING, "Socket received from "
+		log.log(Level.INFO, "Socket received from "
 				+ socket.getInetAddress().getHostName());
+		return null;
 	}
 
 	// Server Implementation End
-	
+
 	/**
-	 * create necessary streams to transfer Data
+	 * create necessary InputStream for Data transfer
 	 * 
 	 * @param socket
 	 * @throws IOException
 	 *             if an I/O error occurs when creating the output stream or if
 	 *             the socket is not connected
+	 * @return DataInputStream
 	 */
-	public static void createStreams() {
+	public static DataInputStream createInputStream(Socket socket) {
 		try {
 			in = new DataInputStream(socket.getInputStream());
-			out = new DataOutputStream(socket.getOutputStream());
+			return in;
 		} catch (IOException e) {
-			log.log(Level.WARNING,
-					"Streams dont created: " + e.getMessage() + "\n");
+			log.log(Level.WARNING, "Streams dont created: " + e.getMessage()
+					+ "\n");
+			return null;
+		}
+	}
+
+	/**
+	 * create necessary OutputStream for Data transfer
+	 * 
+	 * @param socket
+	 * @throws IOException
+	 *             if an I/O error occurs when creating the output stream or if
+	 *             the socket is not connected
+	 * @return DataOutputStream
+	 */
+	public static DataOutputStream createOutputStream(Socket socket) {
+		try {
+			out = new DataOutputStream(socket.getOutputStream());
+			return out;
+		} catch (IOException e) {
+			log.log(Level.WARNING, "Streams dont created: " + e.getMessage()
+					+ "\n");
+			return null;
 		}
 	}
 }

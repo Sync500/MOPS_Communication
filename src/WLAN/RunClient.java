@@ -46,7 +46,7 @@ public class RunClient extends Thread {
 	public void run(){
 			System.out.println("Connection ready. Transfer your Data!");
 			try {
-				Thread.sleep(10000);
+				Thread.sleep(50000);
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
