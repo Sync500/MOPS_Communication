@@ -6,6 +6,8 @@ package WLAN;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.net.Socket;
+import java.net.SocketException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -84,21 +86,28 @@ public class Send_Read {
 	 *            data to send
 	 * @param timeout
 	 *            for transfer operation
+	 * @param socket
+	 *            socket to set timeout
 	 * @param out
 	 *            DataOutputStream
 	 * @return false if timeout overrun
 	 * @return true if send transfer is complete
 	 */
 	public static boolean sendWithTimeOut(byte[] data, int timeout,
-			DataOutputStream out) {
-		log.log(Level.WARNING, "Waiting: " + timeout);
+			Socket socket, DataOutputStream out) {
 		if (data == null) {
 			return false;
-		} else {
-			send(data, 0, data.length, out);
-			log.log(Level.INFO, "Sending Data - complete");
-			return true;
 		}
+		log.log(Level.INFO, "Timeout is: " + timeout);
+		try {
+			socket.setSoTimeout(timeout);
+			send(data, 0, data.length, out);
+			return true;
+		} catch (SocketException e) {
+			e.printStackTrace();
+			log.log(Level.WARNING, "Timeout reached ");
+		}
+		return false;
 	}
 
 	/**

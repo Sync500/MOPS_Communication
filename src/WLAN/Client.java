@@ -26,7 +26,7 @@ public class Client extends Thread {
 	 * 
 	 */
 
-	private static Socket socket;
+	private static Socket socket = null;
 	private static DataInputStream input = null;
 	private static DataOutputStream output = null;
 	private static final Logger log = Logger.getLogger(Client.class.getName());
@@ -54,16 +54,18 @@ public class Client extends Thread {
 	 */
 	public void run() {
 
-		byte b[] = new byte[4];
-		b[0] = 12;
-		b[1] = 11;
-		b[2] = 123;
-		try {
-			Send_Read.sendByteArray(b, output);
-			System.out.println("Sending Data complete");
-		} catch (Exception e) {
-			System.out.println("Socket not accessible!");
-			System.exit(1);
-		} // catch
+//		byte b[] = new byte[4];
+//		b[0] = 12;
+//		b[1] = 11;
+//		b[2] = 123;
+//		if (socket.isConnected()){
+//			try {
+//				Send_Read.sendByteArray(b, output);
+//				System.out.println("Sending Data complete");
+//			} catch (Exception e) {
+//				System.out.println("Socket not accessible!");
+//				System.exit(1);
+//			} // catch
+//		} // if
 	} // run
 }
