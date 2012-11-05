@@ -6,10 +6,8 @@ package WLAN;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.net.SocketAddress;
 import java.net.UnknownHostException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -27,9 +25,37 @@ public class Connecting {
 	private static DataOutputStream out;
 	private static final Logger log = Logger.getLogger(Connecting.class
 			.getName());
-	final static int port = 6665;
-	final static String host = "localhost";
-
+	private static String ip;
+	private static int port;
+	
+	/**
+	 * @param ip to set
+	 */
+	public void setIP(String ip){
+		Connecting.ip = ip;
+	}
+	
+	/**
+	 * @return IP
+	 */
+	public static String getIP(){
+		return ip;
+	}
+	
+	/**
+	 * @param port to set
+	 */
+	public void setPort(int port){
+		Connecting.port = port;
+	}
+	
+	/**
+	 * @return port
+	 */
+	public static int getPort(){
+		return port;
+	}
+	
 	// Client Implementation Begin
 	/**
 	 * connecting to Server without timeout
@@ -40,9 +66,9 @@ public class Connecting {
 	 *             if an I/O error occurs when creating the socket
 	 * @return clientSocket
 	 */
-	public static Socket connectSocket() throws UnknownHostException {
+	public static Socket connectSocket(String ip, int port) throws UnknownHostException {
 		try {
-			socket = new Socket(host, port);
+			socket = new Socket(ip, port);
 			log.log(Level.INFO, "Connect to Server successful");
 			return socket;
 		} catch (IOException e) {
@@ -51,28 +77,6 @@ public class Connecting {
 			e.printStackTrace();
 			return null;
 		}
-	}
-
-	/**
-	 * connect to Server with timeout
-	 * 
-	 * @param timeout
-	 *            set timeout if Server don't response
-	 * @throws IOException
-	 *             if Server don't response then connect again
-	 * @return clientSocket
-	 */
-	public static Socket connectWithTimeOut(int timeout, Socket socket) {
-		// log.log(Level.WARNING, "Timeout is: " + timeout);
-		SocketAddress sockaddr = new InetSocketAddress(host, port);
-		socket = new Socket();
-		try {
-			socket.connect(sockaddr, timeout);
-			return socket;
-		} catch (IOException e) {
-			log.log(Level.WARNING, "Server dont response");
-		}
-		return null;
 	}
 
 	// Client Implementation End
@@ -85,8 +89,9 @@ public class Connecting {
 	 *             - if an I/O error occurs when opening the socket
 	 * @return Socket
 	 */
-	public static Socket connectServerSocket() {
+	public static Socket connectServerSocket (String ip, int port) {
 		try {
+			if (ip == "") ip = "localhost";
 			server = new ServerSocket(port); // throw IOException
 			socket = WaitForClient();
 			return socket;

@@ -14,7 +14,7 @@ import java.util.logging.Logger;
 /**
  * @author Daniel
  * @version 1.0
- * @date: 30.10.2012
+ * @date: 04.11.2012
  */
 public class Send_Read {
 
@@ -93,8 +93,8 @@ public class Send_Read {
 	 * @return false if timeout overrun
 	 * @return true if send transfer is complete
 	 */
-	public static boolean sendWithTimeOut(byte[] data, int timeout,
-			Socket socket, DataOutputStream out) {
+	public static boolean sendBlock(byte[] data, int timeout, Socket socket,
+			DataOutputStream out) {
 		if (data == null) {
 			return false;
 		}
