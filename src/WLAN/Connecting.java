@@ -15,7 +15,7 @@ import java.util.logging.Logger;
 /**
  * @author Daniel
  * @version 1.0
- * @date: 02.11.2012
+ * @date: 06.11.2012
  */
 public class Connecting {
 
